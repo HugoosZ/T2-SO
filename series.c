@@ -37,12 +37,26 @@ void *verserie(void *arg){
     pthread_mutex_lock(&mutex);    
 
     if(id < 7){
-        
-        TseriesD = TseriesD - Tvisualizacion;
-        TdeCadaProfesorD[id - 1] =  Tvisualizacion;
+
+        if(TseriesD >= Tvisualizacion){
+            TseriesD = TseriesD - Tvisualizacion;
+            TdeCadaProfesorD[id - 1] =  Tvisualizacion;
+        }
+        else{
+            Tvisualizacion = TseriesD;
+            TdeCadaProfesorD[id - 1] =  Tvisualizacion;
+        }
+
     }else {
-        TseriesB = TseriesB - Tvisualizacion;
-        TdeCadaProfesorB[id - 7] =  Tvisualizacion;
+
+        if (TseriesB > Tvisualizacion){
+            TseriesB = TseriesB - Tvisualizacion;
+            TdeCadaProfesorB[id - 7] =  Tvisualizacion;
+        }
+        else{
+            Tvisualizacion = TseriesB;
+            TdeCadaProfesorB[id - 7] =  Tvisualizacion;
+        }
 
     }   
     Bool++;
@@ -62,13 +76,12 @@ void *verserie(void *arg){
         for(int i = 0; i < 6; i++){
             sumatoriaB += TdeCadaProfesorB[i];
         }
-        printf("Los profesores vieron: %.1f series de Dasney\n", sumatoriaD);
-        printf("Los profesores vieron: %.1f series de Betflix\n", sumatoriaB);
+        printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
+        printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
         printf("-------------------------------------------------------\n");
         printf("Quedan %.1f series de Dasney\n", TseriesD);
         printf("Quedan %.1f series de Betflix\n", TseriesB);
     }
-    // Tiempo aleatorio para ver la serie
     
     pthread_mutex_unlock(&mutex);
 
