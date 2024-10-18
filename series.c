@@ -20,6 +20,9 @@ float sumatoriaD = 0;
 float sumatoriaB = 0;
 int Bool = 0;
 int Nsemana = 1;
+float auxD = 0;
+float auxB = 0;
+
 sem_t semaforo;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutexdebool = PTHREAD_MUTEX_INITIALIZER;
@@ -69,6 +72,18 @@ void *verserie(void *arg){
     pthread_mutex_unlock(&mutexdebool);
 
     if(Bool == 12){
+        if(Nsemana > 1){
+            printf("-------------------------------------------------------\n");
+            printf("Series acumuladas faltantes por ver de la semana pasada de Dasney: %.1f\n", StseriesD);
+            printf("Series acumuladas faltantes por ver de la semana pasada de Betflix: %.1f\n", StseriesB);
+            printf("-------------------------------------------------------\n");
+            auxD = auxD + StseriesD  ; 
+            auxB = auxB + StseriesB ;
+
+            printf("Series acumuladas por ver Dasney: %.1f\n", auxD);
+            printf("Series acumuladas por ver Netflix: %.1f\n", auxB);
+
+        }
 
         printf("-------------------------------------------------------\n");
         for(int i = 0; i < 6; i++){
@@ -88,8 +103,13 @@ void *verserie(void *arg){
         printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
         printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
         printf("-------------------------------------------------------\n");
-        printf("Quedan %.1f series de Dasney\n", TseriesD);
-        printf("Quedan %.1f series de Betflix\n", TseriesB);
+        StseriesD += TseriesD;
+        StseriesB += TseriesB;
+
+        
+        printf("Quedan %.1f series de totales de Dasney por ver\n", StseriesD);
+        printf("Quedan %.1f series de totales de Betflix por ver\n", StseriesB);
+
 
     }
     
@@ -147,8 +167,10 @@ int main(void){
         printf("Semana %d\n", Nsemana);
         printf("-------------------------------------------------------\n");
 
-        printf("Series de Dasney: %.1f\n", TseriesD);
-        printf("Series de Betflix: %.1f\n", TseriesB);
+        printf("Esta semana salieron %.1f series de Dasney\n", TseriesD);
+        printf("Esta semana salieron %.1f series de Betflix\n", TseriesB);
+        auxB = TseriesB;
+        auxD = TseriesD;
 
         for(int i = 0; i < 6; i++){
             int *idD = malloc(sizeof(int));  // Reservar memoria para cada id
@@ -165,6 +187,8 @@ int main(void){
         }
         Ctiempo--;
         Nsemana++;
+        TseriesD = 0;
+        TseriesB = 0;
     }
 
 
