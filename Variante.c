@@ -25,7 +25,6 @@ float auxB = 0;
 
 int Pd = 0;
 int Pb = 0;
-float CScadaThread = 0;
 sem_t semaforoD;
 sem_t semaforoB;
 
@@ -40,6 +39,15 @@ float t_serie(void){
 int c_series(void){
     int series = rand() % 6 + 10;
     return series;
+}
+
+float *Productor(void *arg){
+    float CS[(Pd + Pb)];
+    for(int i = 0; i < (Pd + Pb); i++){
+        
+    }
+
+
 }
 
 

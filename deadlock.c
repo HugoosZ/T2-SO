@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <semaphore.h>
+#include <unistd.h> 
 
 
 
@@ -22,15 +23,13 @@ int Bool = 0;
 int Nsemana = 1;
 float auxD = 0;
 float auxB = 0;
-
-int Pd = 0;
-int Pb = 0;
-float CScadaThread = 0;
+int P = 0;
 sem_t semaforoD;
 sem_t semaforoB;
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutexdebool = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutexD = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutexB = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutexbool = PTHREAD_MUTEX_INITIALIZER;
 
 // Función que retorna un valor aleatorio del arreglo t[]
 float t_serie(void){
@@ -42,16 +41,25 @@ int c_series(void){
     return series;
 }
 
-
-
 void *verserie(void *arg){
     int id = *(int *)arg;  //B>7
     float Tvisualizacion = t_serie();
     sem_wait(&semaforoD);
     sem_wait(&semaforoB);
-    pthread_mutex_lock(&mutex);    
-
-    if(id < (Pd + 1)){
+    if(id < (P + 1)){
+        // Deadlock: Los hilos Dasney adquieren primero `mutex1` y luego `mutex2`
+        pthread_mutex_lock(&mutexD);
+        printf("Profesor Dasney %d adquirió mutex1\n", id);
+        pthread_mutex_lock(&mutexB);
+        printf("Profesor Dasney %d adquirió mutex2\n", id);
+    } else {
+        // Deadlock: Los hilos Betflix adquieren primero `mutex2` y luego `mutex1`
+        pthread_mutex_lock(&mutexB);
+        printf("Profesor Betflix %d adquirió mutex2\n", id);
+        pthread_mutex_lock(&mutexD);
+        printf("Profesor Betflix %d adquirió mutex1\n", id);
+    }
+    if(id < (P + 1)){
 
         if(TseriesD >= Tvisualizacion){
             TseriesD = TseriesD - Tvisualizacion;
@@ -74,11 +82,11 @@ void *verserie(void *arg){
         }
 
     }   
-    pthread_mutex_lock(&mutexdebool);
+    pthread_mutex_lock(&mutexbool);
     Bool++;
-    pthread_mutex_unlock(&mutexdebool);
+    pthread_mutex_unlock(&mutexbool);
+    if(Bool == 12){
 
-    if(Bool == (Pd + Pb)){
         if(Nsemana > 1){
             if(Nsemana == 2){
                 printf("-------------------------------------------------------\n");
@@ -127,10 +135,8 @@ void *verserie(void *arg){
 
 
     }
+
     
-    pthread_mutex_unlock(&mutex);
-
-
     free(arg); 
     return NULL;
 }
@@ -138,15 +144,18 @@ void *verserie(void *arg){
 int main(void){
 
     srand((unsigned int)time(NULL));    
-    Pd = 6;
-    Pb = 6;
+    int Pd = 6;
+    P = Pd;
+    int Pb = 6;
     pthread_t PD[Pd];  // Profesores que ven Dasney
     pthread_t PB[Pb];  // Profesores que ven Betflix
-    pthread_t generador;
+
     sem_init(&semaforoD, 0, Pd);
     sem_init(&semaforoB, 0, Pb);
     int N = 0;
     int Ctiempo = 0;
+    printf("DEADLOCKKKK\n");
+
     printf("Ingrese el tiempo:\n");
     printf("[1] 1 Mes\n");
     printf("[2] 6 Mes\n");
@@ -172,10 +181,11 @@ int main(void){
     }
 
     printf("Tiempo: %d\n", Ctiempo);
-    pthread_mutex_init(&mutex, NULL);
-    pthread_mutex_init(&mutexdebool, NULL);
+    pthread_mutex_init(&mutexD, NULL);
+    pthread_mutex_init(&mutexB, NULL);
+    pthread_mutex_init(&mutexbool, NULL);
 
-    while(Ctiempo > 0){
+    while(Ctiempo > 0){ 
         Bool = 0;
         sumatoriaB = 0;
         sumatoriaD = 0;
