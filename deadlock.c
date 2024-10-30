@@ -47,17 +47,17 @@ void *verserie(void *arg){
     sem_wait(&semaforoD);
     sem_wait(&semaforoB);
     if(id < (P + 1)){
-        // Deadlock: Los hilos Dasney adquieren primero `mutex1` y luego `mutex2`
         pthread_mutex_lock(&mutexD);
-        printf("Profesor Dasney %d adquirió mutex1\n", id);
+        sleep(1);
         pthread_mutex_lock(&mutexB);
-        printf("Profesor Dasney %d adquirió mutex2\n", id);
+        pthread_mutex_unlock(&mutexB);
+        pthread_mutex_unlock(&mutexD);
     } else {
-        // Deadlock: Los hilos Betflix adquieren primero `mutex2` y luego `mutex1`
         pthread_mutex_lock(&mutexB);
-        printf("Profesor Betflix %d adquirió mutex2\n", id);
+        sleep(1);
         pthread_mutex_lock(&mutexD);
-        printf("Profesor Betflix %d adquirió mutex1\n", id);
+        pthread_mutex_unlock(&mutexD);
+        pthread_mutex_unlock(&mutexB);
     }
     if(id < (P + 1)){
 
@@ -69,6 +69,8 @@ void *verserie(void *arg){
             Tvisualizacion = TseriesD;
             TdeCadaProfesorD[id - 1] =  Tvisualizacion;
         }
+        pthread_mutex_unlock(&mutexB);
+        pthread_mutex_unlock(&mutexD);
 
     }else {
 
@@ -80,63 +82,12 @@ void *verserie(void *arg){
             Tvisualizacion = TseriesB;
             TdeCadaProfesorB[id - 7] =  Tvisualizacion;
         }
+        pthread_mutex_unlock(&mutexD);
+        pthread_mutex_unlock(&mutexB);
 
     }   
-    pthread_mutex_lock(&mutexbool);
-    Bool++;
-    pthread_mutex_unlock(&mutexbool);
-    if(Bool == 12){
 
-        if(Nsemana > 1){
-            if(Nsemana == 2){
-                printf("-------------------------------------------------------\n");
-                printf("Series acumuladas faltantes por ver de la semana pasada de Dasney: %.1f\n", StseriesD);
-                printf("Series acumuladas faltantes por ver de la semana pasada de Betflix: %.1f\n", StseriesB);
-                printf("-------------------------------------------------------\n");
-            }
-            else{
-                printf("-------------------------------------------------------\n");
-                printf("Series acumuladas faltantes por ver de las semanas pasadas de Dasney: %.1f\n", StseriesD);
-                printf("Series acumuladas faltantes por ver de las semanas pasadas de Betflix: %.1f\n", StseriesB);
-                printf("-------------------------------------------------------\n");
-            }
-            auxD = auxD + StseriesD  ; 
-            auxB = auxB + StseriesB ;
-
-            printf("Series acumuladas por ver Dasney: %.1f\n", auxD);
-            printf("Series acumuladas por ver Netflix: %.1f\n", auxB);
-
-        }
-
-        printf("-------------------------------------------------------\n");
-        for(int i = 0; i < 6; i++){
-            printf("El profesor %d vio %.1f series de Dasney\n", i + 1, TdeCadaProfesorD[i]);
-        }
-        printf("-------------------------------------------------------\n");
-        for (int i = 0; i < 6; i++){
-            printf("El profesor %d vio %.1f series de Betflix\n", i + 1, TdeCadaProfesorB[i]);
-        }
-        printf("-------------------------------------------------------\n");
-        for(int i = 0; i < 6; i++){
-            sumatoriaD += TdeCadaProfesorD[i];
-        }
-        for(int i = 0; i < 6; i++){
-            sumatoriaB += TdeCadaProfesorB[i];
-        }
-        printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
-        printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
-        printf("-------------------------------------------------------\n");
-        StseriesD += TseriesD;
-        StseriesB += TseriesB;
-
-        
-        printf("Quedan %.1f series de totales de Dasney por ver\n", StseriesD);
-        printf("Quedan %.1f series de totales de Betflix por ver\n", StseriesB);
-
-
-    }
-
-    
+    printf("Profesor %d terminó de ver la serie\n", id);
     free(arg); 
     return NULL;
 }
