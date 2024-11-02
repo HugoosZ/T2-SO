@@ -66,11 +66,11 @@ void *verserie(void *arg){
 
         if (TseriesB > Tvisualizacion){
             TseriesB = TseriesB - Tvisualizacion;
-            TdeCadaProfesorB[id - 7] =  Tvisualizacion;
+            TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
         }
         else{
             Tvisualizacion = TseriesB;
-            TdeCadaProfesorB[id - 7] =  Tvisualizacion;
+            TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
         }
 
     }   
@@ -101,18 +101,18 @@ void *verserie(void *arg){
         }
 
         printf("-------------------------------------------------------\n");
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < Pd; i++){
             printf("El profesor %d vio %.1f series de Dasney\n", i + 1, TdeCadaProfesorD[i]);
         }
         printf("-------------------------------------------------------\n");
-        for (int i = 0; i < 6; i++){
+        for (int i = 0; i < Pb; i++){
             printf("El profesor %d vio %.1f series de Betflix\n", i + 1, TdeCadaProfesorB[i]);
         }
         printf("-------------------------------------------------------\n");
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < Pd; i++){
             sumatoriaD += TdeCadaProfesorD[i];
         }
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < Pb; i++){
             sumatoriaB += TdeCadaProfesorB[i];
         }
         printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
@@ -147,10 +147,7 @@ int main(void){
     sem_init(&semaforoB, 0, Pb);
     int N = 0;
     int Ctiempo = 0;
-    printf("Ingrese el tiempo:\n");
-    printf("[1] 1 Mes\n");
-    printf("[2] 6 Mes\n");
-    printf("[3] 1 Año\n");
+    printf("Ingrese el tiempo:\n[1] 1 Mes\n[2] 6 Mes\n[3] 1 Año\n");
 
     scanf("%d", &N);
     if(N <= 0 || N > 3){
