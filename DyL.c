@@ -9,8 +9,6 @@ float TseriesD;
 float TseriesB;  
 float StseriesD = 0;
 float StseriesB = 0;
-float TD = 0;
-float TB = 0;
 float t[] = {0.5, 1.0, 1.5, 2.0};
 float TdeCadaProfesorD[6];
 float TdeCadaProfesorB[6];
@@ -22,8 +20,7 @@ float auxD = 0;
 float auxB = 0;
 int Pd = 6;
 int Pb = 6;
-sem_t semaforoD;
-sem_t semaforoB;
+
 
 pthread_mutex_t mutexD = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutexB = PTHREAD_MUTEX_INITIALIZER;
@@ -115,9 +112,6 @@ int main(void) {
     srand((unsigned int)time(NULL));
     pthread_t PD[Pd];  // Profesores que ven Dasney
     pthread_t PB[Pb];  // Profesores que ven Betflix
-
-    sem_open(&semaforoD, 0, Pd);
-    sem_open(&semaforoB, 0, Pb);
 
     int N = 0;
     int Ctiempo = 0;

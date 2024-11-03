@@ -11,8 +11,7 @@ float TseriesB;
 float StseriesD = 0;
 float StseriesB = 0;
 
-float TD = 0;
-float TB = 0;
+
 float t[] = {0.5, 1.0, 1.5, 2.0};
 float TdeCadaProfesorD[6];
 float TdeCadaProfesorB[6];
@@ -167,7 +166,6 @@ int main(void){
         Ctiempo = 48;
     }
 
-    printf("Tiempo: %d\n", Ctiempo);
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexdebool, NULL);
 
