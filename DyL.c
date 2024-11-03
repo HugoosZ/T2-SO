@@ -47,23 +47,10 @@ void *deadlock_function(void *arg) {
     float Tvisualizacion = t_serie();
     printf("Profesor %d intentando adquirir recursos para deadlock...\n", id);
 
-    if (id < 7) {
+    if (id < (Pd + 1)) {
         pthread_mutex_lock(&mutexD);
         printf("Profesor Dasney %d adquirió mutexD\n", id);
         sleep(1);
-        pthread_mutex_lock(&mutexB);
-        printf("Profesor Dasney %d adquirió mutexB\n", id);
-    } else {
-        pthread_mutex_lock(&mutexB);
-        printf("Profesor Betflix %d adquirió mutexB\n", id);
-        sleep(1);
-        pthread_mutex_lock(&mutexD);
-        printf("Profesor Betflix %d adquirió mutexD\n", id);
-    }
-
-
-    //Implementacion de logica de codigo correcto que de todas formas no se usará porque no se puede salir del deadlock
-    if(id < (Pd + 1)){
         if(TseriesD >= Tvisualizacion){
             TseriesD = TseriesD - Tvisualizacion;
             TdeCadaProfesorD[id - 1] =  Tvisualizacion;
@@ -72,9 +59,12 @@ void *deadlock_function(void *arg) {
             Tvisualizacion = TseriesD;
             TdeCadaProfesorD[id - 1] =  Tvisualizacion;
         }
-
-    }else {
-
+        pthread_mutex_lock(&mutexB);
+        printf("Profesor Dasney %d adquirió mutexB\n", id);
+    } else {
+        pthread_mutex_lock(&mutexB);
+        printf("Profesor Betflix %d adquirió mutexB\n", id);
+        sleep(1);
         if (TseriesB > Tvisualizacion){
             TseriesB = TseriesB - Tvisualizacion;
             TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
@@ -83,9 +73,9 @@ void *deadlock_function(void *arg) {
             Tvisualizacion = TseriesB;
             TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
         }
-
-    }   
-
+        pthread_mutex_lock(&mutexD);
+        printf("Profesor Betflix %d adquirió mutexD\n", id);
+    }
     pthread_mutex_unlock(&mutexD);
     pthread_mutex_unlock(&mutexB);
     pthread_mutex_lock(&mutexdebool);
@@ -93,53 +83,9 @@ void *deadlock_function(void *arg) {
     pthread_mutex_unlock(&mutexdebool);
 
     if(Bool == (Pd + Pb)){
-        if(Nsemana > 1){
-            if(Nsemana == 2){
-                printf("-------------------------------------------------------\n");
-                printf("Series acumuladas faltantes por ver de la semana pasada de Dasney: %.1f\n", StseriesD);
-                printf("Series acumuladas faltantes por ver de la semana pasada de Betflix: %.1f\n", StseriesB);
-                printf("-------------------------------------------------------\n");
-            }
-            else{
-                printf("-------------------------------------------------------\n");
-                printf("Series acumuladas faltantes por ver de las semanas pasadas de Dasney: %.1f\n", StseriesD);
-                printf("Series acumuladas faltantes por ver de las semanas pasadas de Betflix: %.1f\n", StseriesB);
-                printf("-------------------------------------------------------\n");
-            }
-            auxD = auxD + StseriesD  ; 
-            auxB = auxB + StseriesB ;
-
-            printf("Series acumuladas por ver Dasney: %.1f\n", auxD);
-            printf("Series acumuladas por ver Netflix: %.1f\n", auxB);
-
-        }
-
         printf("-------------------------------------------------------\n");
-        for(int i = 0; i < Pd; i++){
-            printf("El profesor %d vio %.1f series de Dasney\n", i + 1, TdeCadaProfesorD[i]);
-        }
+        printf("Print de datos, que no se verá porque esta en deadlock\n");         
         printf("-------------------------------------------------------\n");
-        for (int i = 0; i < Pb; i++){
-            printf("El profesor %d vio %.1f series de Betflix\n", i + 1, TdeCadaProfesorB[i]);
-        }
-        printf("-------------------------------------------------------\n");
-        for(int i = 0; i < Pd; i++){
-            sumatoriaD += TdeCadaProfesorD[i];
-        }
-        for(int i = 0; i < Pb; i++){
-            sumatoriaB += TdeCadaProfesorB[i];
-        }
-        printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
-        printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
-        printf("-------------------------------------------------------\n");
-        StseriesD += TseriesD;
-        StseriesB += TseriesB;
-
-        
-        printf("Quedan %.1f series de totales de Dasney por ver\n", StseriesD);
-        printf("Quedan %.1f series de totales de Betflix por ver\n", StseriesB);
-
-
     }
     free(arg);
     return NULL;
@@ -200,57 +146,12 @@ void *livelock_function(void *arg) {
         Bool++;
         pthread_mutex_unlock(&mutexdebool);
         if(Bool == (Pd + Pb)){
-            if(Nsemana > 1){
-                if(Nsemana == 2){
-                    printf("-------------------------------------------------------\n");
-                    printf("Series acumuladas faltantes por ver de la semana pasada de Dasney: %.1f\n", StseriesD);
-                    printf("Series acumuladas faltantes por ver de la semana pasada de Betflix: %.1f\n", StseriesB);
-                    printf("-------------------------------------------------------\n");
-                }
-                else{
-                    printf("-------------------------------------------------------\n");
-                    printf("Series acumuladas faltantes por ver de las semanas pasadas de Dasney: %.1f\n", StseriesD);
-                    printf("Series acumuladas faltantes por ver de las semanas pasadas de Betflix: %.1f\n", StseriesB);
-                    printf("-------------------------------------------------------\n");
-                }
-                auxD = auxD + StseriesD  ; 
-                auxB = auxB + StseriesB ;
-
-                printf("Series acumuladas por ver Dasney: %.1f\n", auxD);
-                printf("Series acumuladas por ver Netflix: %.1f\n", auxB);
-
-            }
-
             printf("-------------------------------------------------------\n");
-            for(int i = 0; i < Pd; i++){
-                printf("El profesor %d vio %.1f series de Dasney\n", i + 1, TdeCadaProfesorD[i]);
-            }
+            printf("Print de datos, que no se verá porque esta en livelock\n");         
             printf("-------------------------------------------------------\n");
-            for (int i = 0; i < Pb; i++){
-                printf("El profesor %d vio %.1f series de Betflix\n", i + 1, TdeCadaProfesorB[i]);
-            }
-            printf("-------------------------------------------------------\n");
-            for(int i = 0; i < Pd; i++){
-                sumatoriaD += TdeCadaProfesorD[i];
-            }
-            for(int i = 0; i < Pb; i++){
-                sumatoriaB += TdeCadaProfesorB[i];
-            }
-            printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
-            printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
-            printf("-------------------------------------------------------\n");
-            StseriesD += TseriesD;
-            StseriesB += TseriesB;
-
-            
-            printf("Quedan %.1f series de totales de Dasney por ver\n", StseriesD);
-            printf("Quedan %.1f series de totales de Betflix por ver\n", StseriesB);
-
 
         }
-        
     }
-
     free(arg);
     return NULL;
 }
