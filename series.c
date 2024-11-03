@@ -41,37 +41,6 @@ int c_series(void){
     int series = rand() % 6 + 10;
     return series;
 }
-void imprimir_resultados() {
-    printf("-------------------------------------------------------\n");
-    if (Nsemana > 1) {
-        printf("Series acumuladas faltantes de Dasney de semanas anteriores: %.1f\n", StseriesD);
-        printf("Series acumuladas faltantes de Betflix de semanas anteriores: %.1f\n", StseriesB);
-        printf("-------------------------------------------------------\n");
-    }
-    printf("Series acumuladas por ver Dasney: %.1f\n", auxD);
-    printf("Series acumuladas por ver Betflix: %.1f\n", auxB);
-    printf("-------------------------------------------------------\n");
-    
-    for (int i = 0; i < Pd; i++) {
-        printf("El profesor %d vio %.1f series de Dasney\n", i + 1, TdeCadaProfesorD[i]);
-    }
-    printf("-------------------------------------------------------\n");
-    for (int i = 0; i < Pb; i++) {
-        printf("El profesor %d vio %.1f series de Betflix\n", i + 1, TdeCadaProfesorB[i]);
-    }
-    printf("-------------------------------------------------------\n");
-    
-    sumatoriaD = 0;
-    sumatoriaB = 0;
-    for (int i = 0; i < Pd; i++) sumatoriaD += TdeCadaProfesorD[i];
-    for (int i = 0; i < Pb; i++) sumatoriaB += TdeCadaProfesorB[i];
-    
-    printf("Los profesores vieron %.1f series de Dasney\n", sumatoriaD);
-    printf("Los profesores vieron %.1f series de Betflix\n", sumatoriaB);
-    printf("-------------------------------------------------------\n");
-    printf("Quedan %.1f series de totales de Dasney por ver\n", StseriesD);
-    printf("Quedan %.1f series de totales de Betflix por ver\n", StseriesB);
-}
 
 
 void *verserie(void *arg){
@@ -239,6 +208,12 @@ int main(void){
         TseriesB = 0;
     }
 
-
+    sem_destroy(&semaforoD);
+    sem_destroy(&semaforoB);
+    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&mutexdebool);
+    sem_unlink("semaforoD");
+    sem_unlink("semaforoB");
+    
     return 0;
 }

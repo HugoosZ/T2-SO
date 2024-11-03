@@ -51,42 +51,21 @@ void *deadlock_function(void *arg) {
         pthread_mutex_lock(&mutexD);
         printf("Profesor Dasney %d adquirió mutexD\n", id);
         sleep(1);
-        if(TseriesD >= Tvisualizacion){
-            TseriesD = TseriesD - Tvisualizacion;
-            TdeCadaProfesorD[id - 1] =  Tvisualizacion;
-        }
-        else{
-            Tvisualizacion = TseriesD;
-            TdeCadaProfesorD[id - 1] =  Tvisualizacion;
-        }
+        // Logica de series
         pthread_mutex_lock(&mutexB);
         printf("Profesor Dasney %d adquirió mutexB\n", id);
     } else {
         pthread_mutex_lock(&mutexB);
         printf("Profesor Betflix %d adquirió mutexB\n", id);
         sleep(1);
-        if (TseriesB > Tvisualizacion){
-            TseriesB = TseriesB - Tvisualizacion;
-            TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
-        }
-        else{
-            Tvisualizacion = TseriesB;
-            TdeCadaProfesorB[id - (Pd + 1)] =  Tvisualizacion;
-        }
+        // Logica de series
         pthread_mutex_lock(&mutexD);
         printf("Profesor Betflix %d adquirió mutexD\n", id);
     }
     pthread_mutex_unlock(&mutexD);
     pthread_mutex_unlock(&mutexB);
-    pthread_mutex_lock(&mutexdebool);
-    Bool++;
-    pthread_mutex_unlock(&mutexdebool);
 
-    if(Bool == (Pd + Pb)){
-        printf("-------------------------------------------------------\n");
-        printf("Print de datos, que no se verá porque esta en deadlock\n");         
-        printf("-------------------------------------------------------\n");
-    }
+
     free(arg);
     return NULL;
 }
@@ -99,25 +78,17 @@ void *livelock_function(void *arg) {
     float Tvisualizacion = t_serie();
     
     while (1) {
-        if (id < 7) {  // Profesor Dasney
+        if (id < (Pd + 1)) {  // Profesor Dasney
             trying_dasney = 1;
             if (trying_betflix) {
                 printf("Profesor Dasney %d cediendo a profesores de Betflix...\n", id);
                 sleep(1);
                 continue;
             }
-            // Procede si el otro no está intentando
             pthread_mutex_lock(&mutexD);
             trying_dasney = 0;
             printf("Profesor Dasney %d en región crítica\n", id);
-            if (TseriesD >= Tvisualizacion) {
-                    TseriesD -= Tvisualizacion;
-                    TdeCadaProfesorD[id - 1] = Tvisualizacion;
-                } else {
-                    Tvisualizacion = TseriesD;
-                    TdeCadaProfesorD[id - 1] = Tvisualizacion;
-                    TseriesD = 0;
-                }
+            // Logica de series
             pthread_mutex_unlock(&mutexD);
             break;
         } else {  // Profesor Betflix
@@ -131,39 +102,22 @@ void *livelock_function(void *arg) {
             pthread_mutex_lock(&mutexB);
             trying_betflix = 0;
             printf("Profesor Betflix %d en región crítica\n", id);
-            if (TseriesB >= Tvisualizacion) {
-                    TseriesB -= Tvisualizacion;
-                    TdeCadaProfesorB[id - 7] = Tvisualizacion;
-                } else {
-                    Tvisualizacion = TseriesB;
-                    TdeCadaProfesorB[id - 7] = Tvisualizacion;
-                    TseriesB = 0;
-                }
+            // Logica de series
             pthread_mutex_unlock(&mutexB);
             break;
-        }
-        pthread_mutex_lock(&mutexdebool);
-        Bool++;
-        pthread_mutex_unlock(&mutexdebool);
-        if(Bool == (Pd + Pb)){
-            printf("-------------------------------------------------------\n");
-            printf("Print de datos, que no se verá porque esta en livelock\n");         
-            printf("-------------------------------------------------------\n");
-
         }
     }
     free(arg);
     return NULL;
 }
 
-
 int main(void) {
     srand((unsigned int)time(NULL));
     pthread_t PD[Pd];  // Profesores que ven Dasney
     pthread_t PB[Pb];  // Profesores que ven Betflix
 
-    sem_init(&semaforoD, 0, Pd);
-    sem_init(&semaforoB, 0, Pb);
+    sem_open(&semaforoD, 0, Pd);
+    sem_open(&semaforoB, 0, Pb);
 
     int N = 0;
     int Ctiempo = 0;
@@ -228,6 +182,7 @@ int main(void) {
         TseriesD = 0;
         TseriesB = 0;
     }
+    
 
     return 0;
 }
