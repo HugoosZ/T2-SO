@@ -185,7 +185,7 @@ int main(void){
         auxD = TseriesD;
 
         for(int i = 0; i < Pd; i++){
-            int *idD = malloc(sizeof(int));  // Reservar memoria para cada id
+            int *idD = malloc(sizeof(int)); 
             *idD = i + 1; 
             pthread_create(&PD[i], NULL, verserie, (void *)idD);
         }

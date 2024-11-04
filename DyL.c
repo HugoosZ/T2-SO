@@ -68,12 +68,12 @@ void *deadlock_function(void *arg) {
 }
 
 // Función de Livelock
-volatile int trying_dasney = 1;
-volatile int trying_betflix = 1;
+volatile int trying_dasney = 0;
+volatile int trying_betflix = 0;
+int contador = 0;
 void *livelock_function(void *arg) {
     int id = *(int *)arg;
     float Tvisualizacion = t_serie();
-    
     while (1) {
         if (id < (Pd + 1)) {  // Profesor Dasney
             trying_dasney = 1;
@@ -139,7 +139,6 @@ int main(void) {
         Ctiempo = 48;
     }
 
-    printf("Tiempo: %d\n", Ctiempo);
 
     while (Ctiempo > 0) {
         Bool = 0;
